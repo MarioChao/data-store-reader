@@ -1,0 +1,22 @@
+{
+  "name": "data-store-reader",
+  "tree": {
+    "$className": "DataModel",
+
+    "ServerScriptService": {
+      "Modules": {
+        "$className": "Folder",
+        "$ignoreUnknownInstances": true,
+
+        "DataStoreReader": {
+          "$path": "src/DataStoreReader"
+        },
+
+        "DSR_TestScript": {
+          "$path": "src/DSR_TestScript"
+        }
+      }
+    }
+  },
+  "globIgnorePaths": ["**/wally.toml"]
+}
