@@ -1,6 +1,10 @@
 # Changelogs
 
-## [v0.0.0] First version | 2026/03/12
+## [v0.0.1] Small fix | 2026/03/12 (2)
+
+Fixed DataStoreReader not reading the last page of keys.
+
+## [v0.0.0] First version | 2026/03/12 (1)
 
 Rudimentary version of Data Store Reader:
 - Reads all keys then retrieves all associated data from a data store.

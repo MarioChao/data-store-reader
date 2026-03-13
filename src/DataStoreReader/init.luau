@@ -25,7 +25,7 @@ table.freeze(Constants)
 local getDataStoreKeys
 
 
------ Data Store -----
+----- Data store -----
 
 getDataStoreKeys = function(dataStore: DataStore)
     local success, dataStoreKeyPages = pcall(function()
@@ -33,14 +33,17 @@ getDataStoreKeys = function(dataStore: DataStore)
     end)
     local result = {}
     if success then
-        repeat
+        while true do
             local currentPage = dataStoreKeyPages:GetCurrentPage()
             for _, dataStoreKey: DataStoreKey in currentPage do
                 table.insert(result, dataStoreKey.KeyName)
             end
+            if dataStoreKeyPages.IsFinished then
+                break
+            end
             dataStoreKeyPages:AdvanceToNextPageAsync()
             task.wait()
-        until dataStoreKeyPages.IsFinished
+        end
     end
     return result
 end
