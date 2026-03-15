@@ -1,5 +1,11 @@
 # Changelogs
 
+## [v0.0.2] Memory store caching | 2026/03/14
+
+Data store api calls are now cached in `MemoryStore`.
+- Uses a `MemoryStoreHashMap` with name "**DataStore_<name_of_data_store>**".
+- By default, the cache expires every hour.
+
 ## [v0.0.1] Small fix | 2026/03/12 (2)
 
 Fixed DataStoreReader not reading the last page of keys.
