@@ -1,6 +1,10 @@
 # Changelogs
 
-## [v0.0.2] Memory store caching | 2026/03/14
+## [v0.0.3] Small fix | 2026/03/14 (2)
+
+Added `pcall()` around `:SetAsync()` for memory stores.
+
+## [v0.0.2] Memory store caching | 2026/03/14 (1)
 
 Data store api calls are now cached in `MemoryStore`.
 - Uses a `MemoryStoreHashMap` with name "**DataStore_<name_of_data_store>**".

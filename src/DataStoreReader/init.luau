@@ -16,7 +16,6 @@ local Constants = {}
 Constants.allScopesDataStoreOptions = Instance.new("DataStoreOptions")
 Constants.allScopesDataStoreOptions.AllScopes = true
 
-Constants.memoryStoreRetryTime = 2
 Constants.dataStoreFailRetryTime = 10
 
 Constants.memoryStoreKeyNames = {
@@ -25,6 +24,7 @@ Constants.memoryStoreKeyNames = {
 Constants.memoryStoreStates = {
     waitForData = "_WaitForData",
 }
+Constants.memoryStoreRetryTime = 2
 Constants.memoryStoreFetchTime = 32
 
 Constants.maxThreadsCount = 10
@@ -37,11 +37,12 @@ table.freeze(Constants)
 local getDataStoreKeys_raw
 
 local getMemoryStoreHashMap
+local getSecondsUntilNextHour
 local waitAndGetValueFromMemoryStoreHashMap
+local setMemoryStoreValue
+
 local cached_dataStore_getKeys
 local cached_dataStore_getAsync
-
-local getSecondsUntilNextHour
 
 
 ----- Data store api -----
@@ -68,11 +69,16 @@ getDataStoreKeys_raw = function(dataStore: DataStore)
 end
 
 
------ Cached data store -----
+----- Memory store -----
 
 getMemoryStoreHashMap = function(dataStore: DataStore)
     local name = `DataStore_{dataStore.Name}`
     return MemoryStoreService:GetHashMap(name)
+end
+
+getSecondsUntilNextHour = function()
+    local unixTimestamp = DateTime.now().UnixTimestamp
+    return 3600 - unixTimestamp % 3600
 end
 
 waitAndGetValueFromMemoryStoreHashMap = function(memoryStoreHashMap: MemoryStoreHashMap, key: string)
@@ -94,6 +100,21 @@ waitAndGetValueFromMemoryStoreHashMap = function(memoryStoreHashMap: MemoryStore
     return success, pcallResult
 end
 
+setMemoryStoreValue = function(memoryStoreHashMap: MemoryStoreHashMap, key: string, value: any, expirationTimeFn: () -> number)
+    local success
+    repeat
+        success = pcall(function()
+            memoryStoreHashMap:SetAsync(key, value, expirationTimeFn())
+        end)
+        if not success then
+            task.wait(Constants.memoryStoreRetryTime)
+        end
+    until success
+end
+
+
+----- Cached data store -----
+
 cached_dataStore_getKeys = function(dataStore: DataStore, expirationTimeFn: () -> number)
     local memoryStoreHashMap = getMemoryStoreHashMap(dataStore)
     local key = Constants.memoryStoreKeyNames.getKeys
@@ -109,17 +130,22 @@ cached_dataStore_getKeys = function(dataStore: DataStore, expirationTimeFn: () -
 
     -- If invalid, get from data store
     if not (success and result) then
-        memoryStoreHashMap:SetAsync(key, Constants.memoryStoreStates.waitForData, Constants.memoryStoreFetchTime)
+        setMemoryStoreValue(
+            memoryStoreHashMap,
+            key, Constants.memoryStoreStates.waitForData, function() return Constants.memoryStoreFetchTime end
+        )
         success, result = getDataStoreKeys_raw(dataStore)
         if success then
-            memoryStoreHashMap:SetAsync(key, result, expirationTimeFn())
+            setMemoryStoreValue(
+                memoryStoreHashMap,
+                key, result, expirationTimeFn
+            )
         end
     end
 
     -- Return result
     return success, result
 end
-
 
 cached_dataStore_getAsync = function(dataStore: DataStore, key: string, expirationTimeFn: () -> number)
     local memoryStoreHashMap = getMemoryStoreHashMap(dataStore)
@@ -135,25 +161,23 @@ cached_dataStore_getAsync = function(dataStore: DataStore, key: string, expirati
 
     -- If invalid, get from data store
     if not (success and result) then
-        memoryStoreHashMap:SetAsync(key, Constants.memoryStoreStates.waitForData, Constants.memoryStoreFetchTime)
+        setMemoryStoreValue(
+            memoryStoreHashMap,
+            key, Constants.memoryStoreStates.waitForData, function() return Constants.memoryStoreFetchTime end
+        )
         success, result = pcall(function()
             return dataStore:GetAsync(key)
         end)
         if success then
-            memoryStoreHashMap:SetAsync(key, result, expirationTimeFn())
+            setMemoryStoreValue(
+                memoryStoreHashMap,
+                key, result, expirationTimeFn
+            )
         end
     end
 
     -- Return result
     return success, result
-end
-
-
------ Time -----
-
-getSecondsUntilNextHour = function()
-    local unixTimestamp = DateTime.now().UnixTimestamp
-    return 3600 - unixTimestamp % 3600
 end
 
 

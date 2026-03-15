@@ -2,7 +2,7 @@
 name = "mariochao/data-store-reader"
 description = "Module class for reading all of datastore."
 
-version = "0.0.2"
+version = "0.0.3"
 license = ""
 authors = ["Mario Chao"]
 realm = "server"
