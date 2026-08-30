@@ -2,11 +2,13 @@
 name = "mariochao/data-store-reader"
 description = "Module class for reading all of datastore."
 
-version = "0.0.3"
-license = ""
+version = "0.0.4"
+license = "MIT"
 authors = ["Mario Chao"]
 realm = "server"
 registry = "https://github.com/UpliftGames/wally-index"
-repository = ""
+repository = "https://github.com/MarioChao/data-store-reader"
+
+exclude = ["DSR_TestScript"]
 
 [dependencies]

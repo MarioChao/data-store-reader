@@ -8,4 +8,3 @@ DataStoreReader api:
 - `:readDataStore(name, scope, options)`: reads a data store with the specified parameters.
 - `:getCurrentData()`: gets the data currently read & stored in the object.
 - `:getIsFinishedReading()`: gets whether the DataStoreReader has finished reading a data store.
-

@@ -16,7 +16,7 @@ local DataStoreReader = require(script.Parent.DataStoreReader)
 local function main()
     local dataStoreReader = DataStoreReader.new()
     task.defer(function()
-        dataStoreReader:readDataStore("TestedRank")
+        dataStoreReader:readDataStore("CombinedUserInfo")
     end)
     while not dataStoreReader:getIsFinishedReading() do
         print(dataStoreReader._completedCount)

@@ -49,7 +49,7 @@ local cached_dataStore_getAsync
 
 getDataStoreKeys_raw = function(dataStore: DataStore)
     local success, dataStoreKeyPages = pcall(function()
-        return dataStore:ListKeysAsync()
+        return dataStore:ListKeysAsync(nil, nil, nil, true)
     end)
     local result = {}
     if success then

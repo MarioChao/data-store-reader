@@ -1,5 +1,11 @@
 # Changelogs
 
+## [v0.0.4] List keys exclude deleted | 2026/08/29
+
+Modified `dataStore:ListKeysAsync()` to enable `excludeDeleted`, thus deleted keys won't show up.
+
+Added LICENSE.
+
 ## [v0.0.3] Small fix | 2026/03/14 (2)
 
 Added `pcall()` around `:SetAsync()` for memory stores.
